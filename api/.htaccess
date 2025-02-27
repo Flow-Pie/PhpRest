@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /PhpRest/api/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route /tasks/{task_id} → tasks.php?task_id={task_id}
+RewriteRule ^tasks/([0-9]+)$ tasks.php?task_id=$1 [QSA,L]
+
+# Route /tasks → tasks.php
+RewriteRule ^tasks$ tasks.php [QSA,L]

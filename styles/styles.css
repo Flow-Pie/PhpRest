@@ -1,0 +1,569 @@
+/*CSS variables*/
+:root {
+    --primary-color: #1A0F8E;
+    --background-color: #f3f3f3;
+    --secondary-color: #D1D8C5;
+    --padding-color: #D9D9D9;
+    --text-color: black;
+    --white: white;
+    --danger-color: #e42e2e;
+    --success-color: #1ba71b;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --font-family: 'Outfit', Arial, sans-serif;
+    --border-circle: 50%;
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --spacing-xsm:5px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    min-height: 100vh;
+}
+
+
+
+/*1. Navigation sidebar menu css styles */
+.sidebar {
+    width: 250px;
+    background-color: var(--secondary-color);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: left 0.3s ease;
+}
+
+.sidebar .logo {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    padding: var(--spacing-md);
+    padding-top: var(--spacing-lg); 
+    margin-bottom: var(--spacing-md); 
+    border-radius: var(--border-radius);
+    background: var(--secondary-color);
+    color: white; 
+    text-transform: uppercase; 
+    letter-spacing: 2px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease; 
+}
+
+.sidebar .logo:hover {
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    transition: background-color 0.3s ease;
+}
+
+.sidebar a.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.sidebar a img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.sidebar a:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.menu-toggle{
+    margin-left: var(--spacing-sm);
+    display: none;
+}
+
+.profile {
+    margin-top: auto;
+    background-color: var(--secondary-color);
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.profile-pic img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+
+.profile-info {
+    margin-top: var(--spacing-sm);
+}
+
+.profile-info div {
+    margin: 8px 0;
+    font-size: 10px;
+    color: var(--text-color);
+}
+
+.profile-info div:first-child span {
+    font-weight: bold;
+    padding: var(--spacing-sm);
+}
+
+.profile-info div:nth-child(2) span {
+    font-weight: bold;
+    color: var(--danger-color);
+    padding: var(--spacing-sm);
+}
+
+.profile-info div:nth-child(3) span {
+    font-weight: bold;
+    color: var(--primary-color);
+    padding: var(--spacing-sm);
+    padding-left: 0;
+    padding-top: var(--spacing-md);
+}
+
+.profile:hover {
+    background-color: var(--padding-color);
+    color: var(--white);
+    cursor: pointer;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    padding: var(--spacing-md);
+    margin-left: 300px;
+    margin-right: 50px;
+    margin-top: var(--spacing-lg);
+}
+
+
+
+
+
+/* 2.Task Header css styles */
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--background-color);
+
+}
+
+
+/*2a Filter and Sort Controls css styles */
+.task-header .controls {
+    display: flex;
+    gap: 10px;
+}
+
+.task-header .controls button {
+    background: white;
+    padding: 8px 12px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 5px;
+    transition: 0.2s ease-in-out;
+}
+
+.task-header .controls button:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+
+
+/*2b Controls Dropdowns css styles */
+.filter-dropdown,
+.sort-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--white);
+    border: 1px solid var(--padding-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 150px;
+    display: none;
+    z-index: 1000;
+}
+
+
+.filter-dropdown:hover .dropdown-options, .sort-dropdown:hover .dropdown-options {
+    display: block;
+}
+
+.dropdown-options li {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.dropdown-options li:hover {
+    background:var(--padding-color);
+    transform: translateX(var(--spacing-xsm));
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+}
+
+
+
+
+/* 3 Task List csss styles */
+.task-list {
+    margin-top: var(--spacing-md);
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+}
+
+.task-item {
+    background-color: var(--white);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.task-item input[type="checkbox"] {
+    margin-right: var(--spacing-sm);
+}
+
+.task-item .time {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.time span {
+    font-size: 12px;
+    color: var(--text-color);
+    background-color: var(--padding-color);
+    padding: 5px 15px;
+    border-radius: var(--border-radius);
+}
+
+.task-item:last-child {
+    margin-bottom: 100px;
+}
+
+
+
+/* 3a Task Item Actions(dropdown) css styles */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    background-color: var(--padding-color);
+    border: none;
+    padding: 8px 15px;
+    margin-left: var(--spacing-sm);
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: var(--padding-color);
+    min-width: 180px;
+    padding: var(--spacing-sm);
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+
+}
+
+.dropdown-content button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 8px;
+    font-size: 12px;
+    font-weight: 500;    
+    border-radius: var(--border-radius);
+    transition: background 0.2s ease, transform 0.2s ease;
+    border-style: none;
+    background-color: var(--padding-color);
+    width: 100%;    
+}
+
+.dropdown-content button i {
+    font-size: 16px;
+    transition: color 0.2s ease;
+    padding-left: var(--spacing-sm);
+    
+    
+}
+
+.dropdown-content button:hover {   
+    transform: translateX(4px);
+    background-color: var(--white);
+}
+
+
+.dropdown-content button:nth-child(1){
+    color: var(--primary-color);
+}
+
+.dropdown-content button:nth-child(2) {
+    color: var(--danger-color);
+}
+.dropdown-content button:nth-child(3) {
+    color: var(--success-color);
+}
+
+
+
+/* 4. Add Task button css styles */
+
+.add-task-btn {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 15px;
+    border: none;
+    border-radius: var(--spacing-md);
+    font-weight: bold;
+    cursor: pointer;
+    width: 150px;
+    margin-top: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: fixed;
+    bottom: var(--spacing-md);
+    transition: opacity 0.3s ease;
+}
+
+.add-task-btn i {
+    padding-right: var(--spacing-xsm);
+    font-size: 14px;
+}
+.add-task-btn a{
+    color: var(--white);
+    text-decoration: none;
+}
+
+.add-task-btn span {
+    font-size: 12px;
+    color: var(--white);
+    text-decoration: none;
+}
+
+.add-task-btn:hover {
+    opacity: 0.9;
+}
+
+/* 4a Add Task Modal css styles */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    background-color: var(--padding-color);
+    border-radius: var(--border-radius);
+    color: var(--primary-color);
+}
+.close-modal:hover {
+    color: var(--danger-color);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--padding-color);
+    border-radius: var(--border-radius);
+}
+
+.save-btn {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+
+/* 5. A responsive css Style for mobile devices */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: var(--spacing-sm);
+
+    }
+    .logo {
+        display: none;
+    }
+
+    .content {
+        margin-left: 0;
+        padding: var(--spacing-sm);
+    }
+
+    .task-list {
+        max-height: calc(100vh - 300px);
+    }
+
+    .add-task-btn {
+        position: static;
+        margin: 20px auto;
+    }
+
+    .profile {
+        display: none;
+    }
+
+
+    .menu-toggle {
+        display:inline;
+        cursor: pointer;
+        align-self: flex-start;
+        padding: var(--spacing-sm);
+        left: 10px;
+
+    }
+    .menu-toggle:hover {
+        background: var(--primary-color);
+        color: var(--white);
+        padding:var(--spacing-sm);
+    }
+    .menu img{
+        vertical-align: center;
+    }
+   .menu a{
+       visibility: hidden;
+    }
+
+
+
+    .sidebar.active {
+        left: 0;
+    }
+}
+

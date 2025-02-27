@@ -1,0 +1,21 @@
+.
+├── api
+│   └── tasks.php
+├── assets
+│   └── images
+│       ├── bar-chart.png
+│       ├── clipboard.png
+│       ├── dashboard.png
+│       ├── DummyLogo.png
+│       ├── man.png
+│       └── signature.png
+├── includes
+│   └── db.php
+├── index.html
+├── index.js
+├── index.php
+├── structure.txt
+└── styles
+    └── styles.css
+
+6 directories, 13 files
