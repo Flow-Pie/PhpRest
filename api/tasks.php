@@ -61,21 +61,15 @@ try {
             echo json_encode(['message' => $stmt->affected_rows > 0 ? 'Task updated successfully' : 'Failed to update task']);
             break;
 
-        case 'DELETE':
-            if (!isset($_GET['task_id'])) {
-                http_response_code(400);
-                echo json_encode(['message' => 'Task ID is required']);
-                exit;
-            }
-
-            $task_id = $_GET['task_id'];
-            $stmt = $conn->prepare("DELETE FROM Tasks WHERE task_id = ?");
-            if (!$stmt) throw new Exception("Database error: " . $conn->error);
-
-            $stmt->bind_param("i", $task_id);
-            $stmt->execute();
-
-            echo json_encode(['message' => $stmt->affected_rows > 0 ? 'Task deleted successfully' : 'Failed to delete task']);
+            case 'DELETE':
+                $task_id = $_GET['task_id'];
+                $query = "DELETE FROM Tasks WHERE task_id = $task_id";
+                if ($conn->query($query)) {
+                    echo json_encode(['message' => 'Task deleted']);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(['message' => 'Failed to delete tasks', 'error' => $conn->error]);
+                }
             break;
 
         default:
