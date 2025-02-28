@@ -29,8 +29,8 @@
                 <img src="assets/images/man.png" alt="User Profile Picture">
             </div>
             <div class="profile-info">
-                <div>Logged In As: <span>User</span></div>
-                <div>Access Level: <span>High</span></div>
+                <div id="current-user">Logged In As: <span>User</span></div>
+                <div id="access-level">Access Level: <span>High</span></div>
                 <div><span>2:30:59 AM</span></div>
             </div>
         </div>
@@ -39,28 +39,34 @@
     <div class="content main" aria-label="Main Content">
         <header class="task-header">
             <h2>Here are your tasks!</h2>
-            <div class="controls">
+            <div class="controls">             
                 <div class="filter-dropdown">
                     <button type="button" class="filter-toggle">
-                        <i class="fa-solid fa-filter"></i> Filter
+                        <i class="fa-solid fa-filter"></i> Filter: 
+                        <span id="active-filter">
+                            <i class="fa-solid fa-list"></i> All
+                        </span>
                     </button>
                     <ul class="dropdown-options">
-                        <li data-filter="completed">1.Completed Tasks</li>
-                        <li data-filter="pending">2.Pending Tasks</li>
-                        <li data-filter="all">3.All Tasks</li>
+                        <li data-filter="complete" onclick="filterTaskByStatus('complete')">
+                            <i class="fa-solid fa-check"></i> Completed Tasks
+                        </li>
+                        <li data-filter="pending" onclick="filterTaskByStatus('pending')">
+                            <i class="fa-solid fa-clock"></i> Pending Tasks
+                        </li>
+                        <li data-filter="all" onclick="filterTaskByStatus('all')">
+                            <i class="fa-solid fa-list"></i> All Tasks
+                        </li>
                     </ul>
-                </div>
-
-
+                </div>             
                 <div class="sort-dropdown">
-                    <button type="button" class="sort-toggle" aria-label="Sort Tasks" aria-haspopup="true"
-                        aria-expanded="false">
-                        <i class="fa-solid fa-arrow-down-wide-short"></i> Sort
+                    <button type="button" class="sort-toggle">
+                        <i class="fa-solid fa-arrow-down-wide-short"></i> Sort By: <span id="active-sort">Default</span>
                     </button>
                     <ul class="dropdown-options">
-                        <li data-sort="name">1. Sort by Name</li>
-                        <li data-sort="date">2. Sort by Date</li>
-                        <li data-sort="status">3. Sort by Status</li>
+                        <li data-sort="name" onclick="sortTasks('name')">Name</li>
+                        <li data-sort="date" onclick="sortTasks('date')">Date</li>
+                        <li data-sort="status" onclick="sortTasks('status')">Status</li>
                     </ul>
                 </div>
             </div>
@@ -189,7 +195,7 @@
                         <label for="status">Status</label>
                         <select id="status" required>
                             <option value="pending">Pending</option>
-                            <option value="completed">Completed </option>
+                            <option value="complete">Complete</option>
                         </select>
                     </div>
                     <div class="form-group">

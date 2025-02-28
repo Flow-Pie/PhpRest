@@ -1,22 +1,117 @@
-const loggedInUser = 1;
+let loggedInUser = 2;
+let tasks = [];
+let currentFilter = 'all'; 
+let currentSort = 'default';
 
-
-async function fetchData() {
+async function fetchTasks() {
     try {
-        const res = await fetch('http://localhost/PhpRest/api/tasks');
+        const res = await fetch('http://localhost/PhpRest/api/tasks');        
         if (!res.ok) {
             throw new Error('Network response was not ok. Failed to fetch');
         }
-        const tasks = await res.json();    
+        tasks = await res.json();    
         console.log("DEBUGGING: ", tasks);
-        renderTasks(tasks);
-        return tasks;
+        renderTasks(tasks);        
     } catch (err) {
         console.error("ERROR fetching tasks: ", err);
     }
 }
 
-fetchData();
+fetchTasks();
+
+async function fetchUsers() {
+    try {
+        const res = await fetch('http://localhost/PhpRest/api/users');
+        if (!res.ok) {
+            throw new Error('Network response was not ok. Failed to fetch');
+        }
+        const users = await res.json();
+        setUserProfile(users);
+        console.log("DEBUGGING: ", users);        
+        
+    } catch (err) {
+        console.error("ERROR fetching users: ", err);
+    }
+}
+
+fetchUsers();
+
+
+function filterTaskByStatus(filter = 'all') {
+    currentFilter = filter;
+
+    const activeFilterElement = document.getElementById('active-filter');
+    if (activeFilterElement) {
+        let filterText, filterIcon;
+        switch (filter) {
+            case 'complete':
+                filterText = 'Completed';
+                filterIcon = 'fa-check';
+                break;
+            case 'pending':
+                filterText = 'Pending';
+                filterIcon = 'fa-clock';
+                break;
+            default:
+                filterText = 'All';
+                filterIcon = 'fa-list';
+        }
+
+        activeFilterElement.innerHTML = `
+            <i class="fa-solid ${filterIcon}"></i> ${filterText}
+        `;
+    }
+
+    applyFilterAndSort();
+}
+
+
+function sortTasks(sortBy = 'default') {
+    currentSort = sortBy; 
+
+    const activeSortElement = document.getElementById('active-sort');
+    if (activeSortElement) {
+        activeSortElement.textContent =
+            sortBy === 'name' ? 'Name' :
+            sortBy === 'date' ? 'Date' :
+            sortBy === 'status' ? 'Status' :
+            'Default';
+    }
+
+    applyFilterAndSort();
+}
+
+function applyFilterAndSort() {
+    // Step 1: Filter tasks
+    let filteredTasks = tasks.filter(task => {
+        if (currentFilter === 'complete') {
+            return task.status === 'complete';
+        } else if (currentFilter === 'pending') {
+            return task.status === 'pending';
+        } else {
+            return true; 
+        }
+    });
+
+    // Step 2: Sort tasks
+    let sortedTasks = [...filteredTasks];
+    switch (currentSort) {
+        case 'name':
+            sortedTasks.sort((a, b) => a.task_title.localeCompare(b.task_title));
+            break;
+        case 'date':
+            sortedTasks.sort((a, b) => new Date(a.task_date) - new Date(b.task_date));
+            break;
+        case 'status':
+            sortedTasks.sort((b,a) => a.status.localeCompare(b.status));
+            break;
+        default:
+            break;
+    }
+
+    // Step 3: Render the filtered and sorted tasks
+    renderTasks(sortedTasks);
+}
 
 
 
@@ -33,13 +128,22 @@ function renderTasks(tasks) {
         taskItem.classList.add('task-item');
         taskItem.setAttribute('role', 'listitem');
 
+        if (task.status === 'complete') {
+            taskItem.classList.add('complete');
+        } else {
+            taskItem.classList.add('pending');
+        }
+
         taskItem.innerHTML = `
             <label>
-                <input type="checkbox" aria-label="Mark Task as Complete" id="task${task.task_id}-checkbox">
-                ${task.task_title}
+                <input type="checkbox" aria-label="Mark Task as Complete" id="task${task.task_id}-checkbox" ${task.status === 'complete' ? 'checked' : ''}>
+                ${task.status === 'complete' ? `<s>${task.task_title}</s>` : task.task_title}
             </label>
             <div class="time">
-                <span>⏰ ${task.task_date}</span>
+                <span> ${task.task_date}</span>
+                <div class="status-tag ${task.status === 'complete' ? 'completed-tag' : 'pending-tag'}">
+                    ${task.status === 'complete' ? 'Complete' : 'Pending'}
+                </div>
                 <div class="dropdown">
                     <button type="button" class="dropdown-toggle" aria-label="Task Options" aria-haspopup="true"
                         aria-expanded="false" id="task${task.task_id}-dropdown-toggle">
@@ -49,9 +153,8 @@ function renderTasks(tasks) {
                         <button type="button" aria-label="Edit Task" onclick="edit(${task.task_id}, '${task.task_title}', '${task.task_description}', '${task.task_date}', '${task.status}', '${task.priority}')">
                             Edit <i class="fa-regular fa-pen-to-square"></i>
                         </button>
-
                         <button type="button" aria-label="Delete Task" onclick="confirmDeleteTask(${task.task_id}, '${task.task_title}')">Delete<i class="fa-solid fa-trash"></i></button>
-                        <button type="button" aria-label="Mark Task as Done" onclick="confirmMarkAsDone(${task.task_id})">Mark as Done<i class="fa-regular fa-circle-check"></i></button>
+                        <button type="button" aria-label="Mark Task as Done" onclick="confirmMarkAsDone(${task.task_id}, '${task.task_title}')">Mark as Done<i class="fa-regular fa-circle-check"></i></button>
                     </div>
                 </div>
             </div>
@@ -60,11 +163,25 @@ function renderTasks(tasks) {
     });
 }
 
+function setUserProfile(users){
+    const curUser = document.querySelector('#current-user span');
+    const accessLevel = document.querySelector('#access-level span');
+
+    users.forEach(user => {
+        if (user.user_id == loggedInUser ) {
+            curUser.textContent = user.first_name;
+            accessLevel.textContent = user.role == 'admin' ? 'SUDO' : 'High';
+        }
+    });
+    
+}
+
+
 function toggleMenu() { // For small screens
     const menuToggle = document.querySelector('.menu-toggle');
     const menuLinks = document.querySelectorAll('.menu a');
 
-    let isMenuVisible = false;
+    let isMenuVisible = true;
 
     menuToggle.addEventListener('click', () => {
         menuLinks.forEach(link => {
@@ -107,7 +224,7 @@ async function editTaskHelper(taskId, updatedTask) {
         }
         const result = await response.json();
         console.log('Task updated:', result);
-        fetchData(); // Refresh the task list
+        fetchTasks(); // Refresh the task list
     } catch (error) {
         console.error('Error updating task:', error);
     }
@@ -169,7 +286,7 @@ async function deleteTaskHelper(taskId) {
         }else{
             const result = await response.json();
             console.log('Task deleted:', result);
-            fetchData()// Refresh the task list
+            fetchTasks();
         }
     } catch (error) {
         console.error('Error deleting task:', error);
@@ -185,10 +302,10 @@ function confirmDeleteTask(taskId, title) {
     }
 }
 
-async function markAsDone(taskId) {
+async function markAsDoneHelper(taskId) {
     try {
         const response = await fetch(`http://localhost/PhpRest/api/tasks?task_id=${taskId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -199,18 +316,18 @@ async function markAsDone(taskId) {
         }
         const result = await response.json();
         console.log('Task marked as done:', result);
-        fetchData(); // Refresh the task list
+        fetchTasks(); 
     } catch (error) {
         console.error('Error marking task as done:', error);
     }
 }
 
-function confirmMarkAsDone(taskId) {
-    const isConfirmed = confirm("Are you sure you want to mark task " + taskId + " as done?");
+function confirmMarkAsDone(taskId, title) {
+    const isConfirmed = confirm("Are you sure you want to mark task " + title + " as done?");
     if (isConfirmed) {
-        markAsDone(taskId); // Call the async function to mark the task as done
+        markAsDoneHelper(taskId); 
     } else {
-        console.log("Marking as done cancelled for task: " + taskId);
+        console.log("Marking as done cancelled for task: " + title);
     }
 }
 

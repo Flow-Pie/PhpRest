@@ -1,6 +1,7 @@
 RewriteEngine On
 RewriteBase /PhpRest/api/
 
+# Ignore existing files and directories
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
@@ -9,3 +10,6 @@ RewriteRule ^tasks/([0-9]+)$ tasks.php?task_id=$1 [QSA,L]
 
 # Route /tasks → tasks.php
 RewriteRule ^tasks$ tasks.php [QSA,L]
+
+# Route /users → tasks.php?users
+RewriteRule ^users$ tasks.php?users [QSA,L]

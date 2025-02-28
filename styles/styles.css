@@ -209,44 +209,102 @@ body {
 
 
 /*2b Controls Dropdowns css styles */
-.filter-dropdown,
-.sort-dropdown {
+
+#active-filter, #active-sort {
+    font-weight: bold;
+    color: #4caf50;
+    margin-left: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 12px;
+    background-color: #e8f5e9; 
+    border: 1px solid #c8e6c9; 
+}
+
+#active-filter i {
+    font-size: 14px; 
+}
+
+.filter-dropdown, .sort-dropdown {
     position: relative;
     display: inline-block;
 }
 
 .dropdown-options {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: var(--white);
-    border: 1px solid var(--padding-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 150px;
     display: none;
-    z-index: 1000;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
-
-.filter-dropdown:hover .dropdown-options, .sort-dropdown:hover .dropdown-options {
+.sort-dropdown:hover .dropdown-options, .filter-dropdown:hover .dropdown-options {
     display: block;
 }
 
 .dropdown-options li {
-    padding: 8px 12px;
+    padding: 12px 16px;
     cursor: pointer;
-    transition: 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .dropdown-options li:hover {
-    background:var(--padding-color);
-    transform: translateX(var(--spacing-xsm));
-    border-radius: var(--border-radius);
-    color: var(--text-color);
+    background-color: #ddd;
+}
+
+.dropdown-options li i {
+    font-size: 14px; 
+}
+
+/*2c. Sort Dropdown css styles */
+
+.sort-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: 10px; 
+}
+
+.sort-toggle {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.sort-toggle:hover {
+    background-color: #ddd;
+}
+
+.sort-options {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.sort-dropdown:hover .sort-options {
+    display: block;
+}
+
+.sort-options li {
+    padding: 12px 16px;
+    cursor: pointer;
+}
+
+.sort-options li:hover {
+    background-color: #ddd;
 }
 
 
@@ -290,6 +348,44 @@ body {
 
 .task-item:last-child {
     margin-bottom: 100px;
+}
+
+
+.task-item.completed {
+    background-color: #e8f5e9; 
+    border-color: #c8e6c9;
+}
+
+.task-item.completed label {
+    color: #666; /* Gray text for completed tasks */
+}
+
+.status-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 10px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.completed-tag {
+    background-color: var(--success-color);
+    color: white;
+    max-width: 90px;
+}
+
+.pending-tag {
+    background-color: var(--primary-color);
+    color: white;
+    min-width: 90px;
+}
+
+/* Strikethrough for completed tasks */
+s {
+    color: #666; /* Gray text for completed tasks */
 }
 
 
@@ -557,7 +653,7 @@ body {
         vertical-align: center;
     }
    .menu a{
-       visibility: hidden;
+       visibility:visible;
     }
 
 
