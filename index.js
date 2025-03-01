@@ -1,335 +1,235 @@
-let loggedInUser = 2;
-let tasks = [];
-let currentFilter = 'all'; 
-let currentSort = 'default';
+/*****************************
+ *        INITIALIZATION      *
+ *****************************/
 
-async function fetchTasks() {
+let loggedInUser = 2;//simulate logged in user
+let tasks = [],currentFilter = 'all',currentSort = 'default';
+
+
+/*****************************
+ *       FETCH FUNCTIONS      *
+ *****************************/
+const fetchData = async (url, callback) => {
     try {
-        const res = await fetch('http://localhost/PhpRest/api/tasks');        
-        if (!res.ok) {
-            throw new Error('Network response was not ok. Failed to fetch');
-        }
-        tasks = await res.json();    
-        console.log("DEBUGGING: ", tasks);
-        renderTasks(tasks);        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Network error');
+        const data = await res.json();
+        callback(data);
     } catch (err) {
-        console.error("ERROR fetching tasks: ", err);
+        console.error(`Error fetching ${url}:`, err);
     }
-}
+};
 
-fetchTasks();
+const fetchTasks = () => fetchData(`http://localhost/PhpRest/api/tasks`, data => { 
+    tasks = data.filter(task => task.user_id == loggedInUser); // Get only tasks for logged-in user
+    renderTasks(tasks);
+});
 
-async function fetchUsers() {
-    try {
-        const res = await fetch('http://localhost/PhpRest/api/users');
-        if (!res.ok) {
-            throw new Error('Network response was not ok. Failed to fetch');
-        }
-        const users = await res.json();
-        setUserProfile(users);
-        console.log("DEBUGGING: ", users);        
-        
-    } catch (err) {
-        console.error("ERROR fetching users: ", err);
+const fetchUsers = () => fetchData('http://localhost/PhpRest/api/users', setUserProfile);
+
+
+/*****************************
+ *       SETTER METHODS       *
+ *****************************/
+// 1. User Profile
+const setUserProfile = users => {
+    const user = users.find(u => u.user_id == loggedInUser);
+    if (user) {
+        document.querySelector('#current-user span').textContent = user.first_name;
+        document.querySelector('#access-level span').textContent = user.role === 'admin' ? 'SUDO' : 'High';
     }
-}
-
-fetchUsers();
+};
 
 
-function filterTaskByStatus(filter = 'all') {
-    currentFilter = filter;
+/*****************************
+ *        UI UPDATES          *
+ *****************************/
+const updateUIElement = (id, content) => {
+    const element = document.getElementById(id);
+    if (element) element.innerHTML = content;
+};
 
-    const activeFilterElement = document.getElementById('active-filter');
-    if (activeFilterElement) {
-        let filterText, filterIcon;
-        switch (filter) {
-            case 'complete':
-                filterText = 'Completed';
-                filterIcon = 'fa-check';
-                break;
-            case 'pending':
-                filterText = 'Pending';
-                filterIcon = 'fa-clock';
-                break;
-            default:
-                filterText = 'All';
-                filterIcon = 'fa-list';
-        }
-
-        activeFilterElement.innerHTML = `
-            <i class="fa-solid ${filterIcon}"></i> ${filterText}
-        `;
-    }
-
-    applyFilterAndSort();
-}
-
-
-function sortTasks(sortBy = 'default') {
-    currentSort = sortBy; 
-
-    const activeSortElement = document.getElementById('active-sort');
-    if (activeSortElement) {
-        activeSortElement.textContent =
-            sortBy === 'name' ? 'Name' :
-            sortBy === 'date' ? 'Date' :
-            sortBy === 'status' ? 'Status' :
-            'Default';
-    }
-
-    applyFilterAndSort();
-}
-
-function applyFilterAndSort() {
-    // Step 1: Filter tasks
-    let filteredTasks = tasks.filter(task => {
-        if (currentFilter === 'complete') {
-            return task.status === 'complete';
-        } else if (currentFilter === 'pending') {
-            return task.status === 'pending';
-        } else {
-            return true; 
-        }
-    });
-
-    // Step 2: Sort tasks
-    let sortedTasks = [...filteredTasks];
-    switch (currentSort) {
-        case 'name':
-            sortedTasks.sort((a, b) => a.task_title.localeCompare(b.task_title));
-            break;
-        case 'date':
-            sortedTasks.sort((a, b) => new Date(a.task_date) - new Date(b.task_date));
-            break;
-        case 'status':
-            sortedTasks.sort((b,a) => a.status.localeCompare(b.status));
-            break;
-        default:
-            break;
-    }
-
-    // Step 3: Render the filtered and sorted tasks
-    renderTasks(sortedTasks);
-}
-
-
-
-function renderTasks(tasks) {
+const renderTasks = tasks => {
     const taskList = document.querySelector('.task-list');
-    if (!taskList) {
-        console.error("Task list container not found!");
-        return;
-    }
-    taskList.innerHTML = '';
-
-    tasks.forEach(task => {
-        const taskItem = document.createElement('div');
-        taskItem.classList.add('task-item');
-        taskItem.setAttribute('role', 'listitem');
-
-        if (task.status === 'complete') {
-            taskItem.classList.add('complete');
-        } else {
-            taskItem.classList.add('pending');
-        }
-
-        taskItem.innerHTML = `
+    if (!taskList) { taskList.innerHTML = "No tasks"; return; }
+    taskList.innerHTML = tasks.map(task => `
+        <div class="task-item ${task.status}" role="listitem">
             <label>
-                <input type="checkbox" aria-label="Mark Task as Complete" id="task${task.task_id}-checkbox" ${task.status === 'complete' ? 'checked' : ''}>
-                ${task.status === 'complete' ? `<s>${task.task_title}</s>` : task.task_title}
+                <input type="checkbox" aria-label="Mark Task as Complete" ${task.status === 'complete' ? 'checked' : ''}
+                    onchange="confirmMarkAsDone(${task.task_id}, '${escapeHTML(task.task_title)}')">
+                ${task.status === 'complete' ? `<s>${escapeHTML(task.task_title)}</s>` : escapeHTML(task.task_title)}
             </label>
             <div class="time">
-                <span> ${task.task_date}</span>
-                <div class="status-tag ${task.status === 'complete' ? 'completed-tag' : 'pending-tag'}">
-                    ${task.status === 'complete' ? 'Complete' : 'Pending'}
+                <span>${escapeHTML(task.task_date)}</span>
+                <div class="status-tag ${task.status}-tag">
+                    ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                 </div>
-                <div class="dropdown">
-                    <button type="button" class="dropdown-toggle" aria-label="Task Options" aria-haspopup="true"
-                        aria-expanded="false" id="task${task.task_id}-dropdown-toggle">
-                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                <button class="dropdown-toggle" aria-label="Task Options" aria-haspopup="true" aria-expanded="false"
+                    onclick="toggleDropdown(event)">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="dropdown-content" role="menu">
+                    <button onclick="edit(${task.task_id}, '${escapeHTML(task.task_title)}', '${escapeHTML(task.task_description)}', '${task.task_date}', '${task.status}', '${task.priority}')">
+                        Edit <i class="fa-regular fa-pen-to-square"></i>
                     </button>
-                    <div class="dropdown-content" id="task${task.task_id}-dropdown-content">
-                        <button type="button" aria-label="Edit Task" onclick="edit(${task.task_id}, '${task.task_title}', '${task.task_description}', '${task.task_date}', '${task.status}', '${task.priority}')">
-                            Edit <i class="fa-regular fa-pen-to-square"></i>
-                        </button>
-                        <button type="button" aria-label="Delete Task" onclick="confirmDeleteTask(${task.task_id}, '${task.task_title}')">Delete<i class="fa-solid fa-trash"></i></button>
-                        <button type="button" aria-label="Mark Task as Done" onclick="confirmMarkAsDone(${task.task_id}, '${task.task_title}')">Mark as Done<i class="fa-regular fa-circle-check"></i></button>
-                    </div>
+                    <button onclick="confirmDeleteTask(${task.task_id}, '${escapeHTML(task.task_title)}')">
+                        Delete <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <button onclick="confirmMarkAsDone(${task.task_id}, '${escapeHTML(task.task_title)}')">
+                        Mark as Done <i class="fa-regular fa-circle-check"></i>
+                    </button>
                 </div>
             </div>
-        `;
-        taskList.appendChild(taskItem);
+        </div>
+    `).join('');
+};
+
+
+/*****************************
+ *    FILTERING & SORTING     *
+ *****************************/
+const filterTaskByStatus = filter => {
+    currentFilter = filter;
+    updateUIElement('active-filter', `
+        <i class="fa-solid ${filter === 'complete' ? 'fa-check' : filter === 'pending' ? 'fa-clock' : 'fa-list'}"></i>
+        ${filter === 'complete' ? 'Completed' : filter === 'pending' ? 'Pending' : 'All'}
+    `);
+    applyFilterAndSort();
+};
+
+const sortTasks = sortBy => {
+    currentSort = sortBy;
+    updateUIElement('active-sort', sortBy.charAt(0).toUpperCase() + sortBy.slice(1));
+    applyFilterAndSort();
+};
+
+const applyFilterAndSort = () => {
+    const filteredTasks = tasks.filter(task => currentFilter === 'all' || task.status === currentFilter);
+    const sortedTasks = filteredTasks.sort((a, b) => {
+        if (currentSort === 'name') return a.task_title.localeCompare(b.task_title);
+        if (currentSort === 'date') return new Date(a.task_date) - new Date(b.task_date);
+        if (currentSort === 'status') return b.status.localeCompare(a.status);
+        return 0;
     });
-}
+    renderTasks(sortedTasks);
+};
 
-function setUserProfile(users){
-    const curUser = document.querySelector('#current-user span');
-    const accessLevel = document.querySelector('#access-level span');
+const escapeHTML = str => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    users.forEach(user => {
-        if (user.user_id == loggedInUser ) {
-            curUser.textContent = user.first_name;
-            accessLevel.textContent = user.role == 'admin' ? 'SUDO' : 'High';
-        }
+
+/*****************************
+ *     DROPDOWN HANDLING      *
+ *****************************/
+const toggleDropdown = event => {
+    event.stopPropagation();
+    document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('visible'));
+    event.target.nextElementSibling.classList.toggle('visible');
+};
+
+document.addEventListener('click', () => document.querySelectorAll('.dropdown-content.visible').forEach(d => d.classList.remove('visible')));
+
+
+/*****************************
+ *      HELPER METHODS        *
+ *****************************/
+const editTaskHelper = async (taskId, updatedTask) => {
+    await fetch(`http://localhost/PhpRest/api/tasks?task_id=${taskId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTask)
     });
-    
-}
+    fetchTasks();
+};
 
+const deleteTaskHelper = async taskId => {
+    await fetch(`http://localhost/PhpRest/api/tasks/${taskId}`, { method: 'DELETE' });
+    fetchTasks();
+};
 
-function toggleMenu() { // For small screens
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuLinks = document.querySelectorAll('.menu a');
-
-    let isMenuVisible = true;
-
-    menuToggle.addEventListener('click', () => {
-        menuLinks.forEach(link => {
-            if (isMenuVisible) {
-                link.style.visibility = 'hidden';
-            } else {
-                link.style.visibility = 'visible';
-            }
-        });
-
-        // Update the state of the menu toggle
-        isMenuVisible = !isMenuVisible;
-        menuToggle.setAttribute('aria-expanded', isMenuVisible);
+const markAsDoneHelper = async taskId => {
+    await fetch(`http://localhost/PhpRest/api/tasks?task_id=${taskId}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'complete' })
     });
-}
+    fetchTasks();
+};
 
-function updateTime() {
-    const now = new Date();
-    const hours = now.getHours() % 12 || 12;
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-    const timeString = `${hours}:${minutes}:${seconds} ${ampm}`;
-    document.querySelector('.profile-info div:last-child span').textContent = timeString;
-}
+const confirmAction = (message, action) => { if (confirm(message)) action(); };
+const confirmDeleteTask = (taskId, title) => confirmAction(`Delete task ${title}?`, () => deleteTaskHelper(taskId));
+const confirmMarkAsDone = (taskId, title) => confirmAction(`Mark task ${title} as done?`, () => markAsDoneHelper(taskId));
 
-setInterval(updateTime, 1000);
 
-async function editTaskHelper(taskId, updatedTask) {
-    try {
-        const response = await fetch(`http://localhost/PhpRest/api/tasks?task_id=${taskId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedTask),
-        });
-        if (!response.ok) {
-            throw new Error('Failed to update task');
-        }
-        const result = await response.json();
-        console.log('Task updated:', result);
-        fetchTasks(); // Refresh the task list
-    } catch (error) {
-        console.error('Error updating task:', error);
-    }
-}
-
-function edit(taskId, title, description, date, status, priority) {
+/*****************************
+ *       FORM HANDLER         *
+ *****************************/
+const edit = (taskId, title, description, date, status, priority) => {
     const editPanel = document.querySelector('#editTaskModal');
-    const taskTitle = document.querySelector('#task_title');
-    const taskDescription = document.querySelector('#task_description');
-    const taskDate = document.querySelector('#task_date');
-    const taskStatus = document.querySelector('#status');
-    const taskPriority = document.querySelector('#priority');
-   
-    taskTitle.value = title;
-    taskDescription.value = description;
-    if (date) {
-        const formattedDate = new Date(date).toISOString().slice(0, 16);
-        taskDate.value = formattedDate; 
-    }   
-    taskStatus.value = status; 
-    taskPriority.value = priority;
-   
+    const form = document.querySelector('#editTaskForm');
+
+    form.querySelector('#task_id').value = taskId;
+    form.querySelector('#task_id').readOnly = true;
+    form.querySelector('#task_title').value = title;
+    form.querySelector('#task_description').value = description;
+    form.querySelector('#task_date').value = date ? new Date(date).toISOString().slice(0, 16) : '';
+    form.querySelector('#status').value = status;
+    form.querySelector('#priority').value = priority;
 
     editPanel.classList.add('active');
 
-    const form = document.querySelector('#editTaskForm');
-    const handleSubmit = async (event) => {
+    form.onsubmit = async event => {
         event.preventDefault();
-
-        const isConfirmed = confirm("Are you sure you want to edit task " + title + "?");
-        if (isConfirmed) {
-            const updatedTask = {
+        if (confirm(`Are you sure you want to edit task "${title}"?`)) {
+            await editTaskHelper(taskId, {
                 task_id: taskId,
-                task_title: taskTitle.value,
-                task_description: taskDescription.value,
-                task_date: taskDate.value,
-                status: taskStatus.value, 
-                priority: taskPriority.value,
-            };
-
-            await editTaskHelper(taskId, updatedTask);
+                task_title: form.querySelector('#task_title').value,
+                task_description: form.querySelector('#task_description').value,
+                task_date: form.querySelector('#task_date').value,
+                status: form.querySelector('#status').value,
+                priority: form.querySelector('#priority').value
+            });
             editPanel.classList.remove('active');
-            form.removeEventListener('submit', handleSubmit);
-        } else {
-            console.log("Edit cancelled for task: " + taskId);
         }
     };
+};
 
-    form.addEventListener('submit', handleSubmit);
+
+/*****************************
+ *       TIME & MENU          *
+ *****************************/
+const updateTime = () => {
+    const now = new Date();
+    document.querySelector('.profile-info div:last-child span').textContent = `
+        ${now.getHours() % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}
+        ${now.getHours() >= 12 ? 'PM' : 'AM'}
+    `;
+};
+setInterval(updateTime, 1000);
+
+function setActiveMenu() {
+    const currentPage = window.location.pathname.split('/').pop(); 
+    const menuItems = document.querySelectorAll('.menu a');
+
+    menuItems.forEach(item => {
+        const itemPage = item.getAttribute('href').split('/').pop();
+        item.classList.toggle('active', itemPage === currentPage);
+    });
 }
 
-async function deleteTaskHelper(taskId) {
-    try {
-        const response = await fetch(`http://localhost/PhpRest/api/tasks/${taskId}`, {
-            method: 'DELETE',
-        });
-        if (!response.ok) {
-            throw new Error('Failed to delete task');
-        }else{
-            const result = await response.json();
-            console.log('Task deleted:', result);
-            fetchTasks();
-        }
-    } catch (error) {
-        console.error('Error deleting task:', error);
-    }
-}
 
-function confirmDeleteTask(taskId, title) {
-    const isConfirmed = confirm("Are you sure you want to delete task " + title + "?");
-    if (isConfirmed) {
-        deleteTaskHelper(taskId); 
-    } else {
-        console.log("Deletion cancelled for task: " + title);
-    }
-}
+/*****************************
+ *      EVENT LISTENERS       *
+ *****************************/
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelectorAll('.menu a').forEach(link => link.style.visibility = link.style.visibility === 'hidden' ? 'visible' : 'hidden');
+});
 
-async function markAsDoneHelper(taskId) {
-    try {
-        const response = await fetch(`http://localhost/PhpRest/api/tasks?task_id=${taskId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: 'complete' }),
-        });
-        if (!response.ok) {
-            throw new Error('Failed to mark task as done');
-        }
-        const result = await response.json();
-        console.log('Task marked as done:', result);
-        fetchTasks(); 
-    } catch (error) {
-        console.error('Error marking task as done:', error);
-    }
-}
+document.addEventListener('DOMContentLoaded', setActiveMenu);
 
-function confirmMarkAsDone(taskId, title) {
-    const isConfirmed = confirm("Are you sure you want to mark task " + title + " as done?");
-    if (isConfirmed) {
-        markAsDoneHelper(taskId); 
-    } else {
-        console.log("Marking as done cancelled for task: " + title);
-    }
-}
 
-updateTime();
-toggleMenu();
+/*****************************
+ *   INITIALIZATION & SETUP   *
+ *****************************/
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUsers();
+    fetchTasks();
+    setActiveMenu();
+});

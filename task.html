@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Dashboard</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&display=swap" rel="stylesheet"><!-- Outfit Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><!-- Font Awesome Icons -->
+
+</head>
+
+<body>
+    <nav class="sidebar menu" aria-label="Sidebar Navigation">
+        <div class="menu-toggle">
+            ☰
+        </div>
+
+        <div class="logo" role="heading" aria-level="1">LOGO</div>
+        <a href="dashboard.html" aria-label="Dashboard" id="dashboard-link"><img src="assets/images/dashboard.png" alt="Dashboard Icon">Dashboard</a>
+        <a href="task.html" id="tasks-link" aria-label="Tasks"><img src="assets/images/clipboard.png" alt="Task Icon">Task</a>
+        <a href="new-task.html" aria-label="New Task" id="new-task-link"><img src="assets/images/signature.png" alt="New Task Icon">New Task</a>
+
+
+        <div class="profile" role="region" aria-label="User Profile">
+            <div class="profile-pic">
+                <img src="assets/images/man.png" alt="User Profile Picture">
+            </div>
+            <div class="profile-info">
+                <div id="current-user">Logged In As: <span>User</span></div>
+                <div id="access-level">Access Level: <span>High</span></div>
+                <div><span>2:30:59 AM</span></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content main" aria-label="Main Content">
+        <header class="task-header">
+            <h2 class="task-h2">Here are your tasks!</h2>
+            <div class="controls">             
+                <div class="filter-dropdown">
+                    <button type="button" class="filter-toggle">
+                        <i class="fa-solid fa-filter"></i> Filter: 
+                        <span id="active-filter">
+                            <i class="fa-solid fa-list"></i> All
+                        </span>
+                    </button>
+                    <ul class="dropdown-options">
+                        <li data-filter="complete" onclick="filterTaskByStatus('complete')">
+                            <i class="fa-solid fa-check"></i> Completed Tasks
+                        </li>
+                        <li data-filter="pending" onclick="filterTaskByStatus('pending')">
+                            <i class="fa-solid fa-clock"></i> Pending Tasks
+                        </li>
+                        <li data-filter="all" onclick="filterTaskByStatus('all')">
+                            <i class="fa-solid fa-list"></i> All Tasks
+                        </li>
+                    </ul>
+                </div>             
+                <div class="sort-dropdown">
+                    <button type="button" class="sort-toggle">
+                        <i class="fa-solid fa-arrow-down-wide-short"></i> Sort By: <span id="active-sort">Default</span>
+                    </button>
+                    <ul class="dropdown-options">
+                        <li data-sort="name" onclick="sortTasks('name')">Name</li>
+                        <li data-sort="date" onclick="sortTasks('date')">Date</li>
+                        <li data-sort="status" onclick="sortTasks('status')">Status</li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <section class="task-list" aria-label="Task List">            
+            <p style="padding-left: 30px; font-size: 8px;"> <br> <br><br>No tasks found........</p>
+
+            <!-- js will handle this! -->
+        </section>
+
+        <!-- Pop up for editing task -->
+        <div id="editTaskModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="document.getElementById('editTaskModal').classList.remove('active')">
+                    &times;
+                </span>
+                <h2>Edit Task</h2>
+                <form id="editTaskForm">
+                    <div class="form-group">
+                        <label for="task_id">Task Id</label>
+                        <div class="readonly-container">
+                            <input type="text" id="task_id" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="task_title">Task Title</label>
+                        <input type="text" id="task_title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task_description">Description</label>
+                        <textarea id="task_description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="task_date">Date</label>
+                        <input type="datetime-local" id="task_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="complete">Complete</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <select id="priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="save-btn">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    
+
+        <button class="add-task-btn">
+            <a href="#" aria-label="Add Task" type="button"><i class="fa-solid fa-plus"></i><span>Add Task</span>     </button>
+    </div>    
+    <script src="index.js"></script>
+</body>
+
+</html>

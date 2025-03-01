@@ -28,7 +28,7 @@ try {
                 $task = $result->fetch_assoc();
 
                 echo json_encode($task ?: ['message' => 'Task not found']);
-            } elseif (isset($_GET['users'])) {
+            } else if (isset($_GET['users'])) {
                 $query = "SELECT * FROM Users";
                 $result = $conn->query($query);
 

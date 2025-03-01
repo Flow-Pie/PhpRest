@@ -95,6 +95,32 @@ body {
     color: var(--white);
 }
 
+
+.menu a.active {
+    background-color: var(--primary-color); /* Use your primary color */
+    color: var(--white); /* White text */
+    font-weight: 500; /* Semi-bold text */
+    border-radius: var(--border-radius); /* Rounded corners */
+    box-shadow: var(--shadow); /* Subtle shadow for depth */
+    padding: var(--spacing-xsm) var(--spacing-sm); /* Add some padding */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.menu a.active img {
+    filter: brightness(0) invert(1); 
+}
+
+
+.menu a.active:hover {
+    background-color: var(--secondary-color); /* Change background on hover */
+    color: var(--primary-color); /* Change text color on hover */
+    border-left-color: var(--primary-color); /* Change border color on hover */
+}
+
+
+
+
+
 .menu-toggle{
     margin-left: var(--spacing-sm);
     display: none;
@@ -371,10 +397,10 @@ body {
     text-align: center;
 }
 
-.completed-tag {
+.complete-tag {
     background-color: var(--success-color);
     color: white;
-    max-width: 90px;
+    min-width: 90px;
 }
 
 .pending-tag {
@@ -383,9 +409,9 @@ body {
     min-width: 90px;
 }
 
-/* Strikethrough for completed tasks */
+
 s {
-    color: #666; /* Gray text for completed tasks */
+    color: #666; 
 }
 
 
@@ -424,15 +450,22 @@ s {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+.dropdown-content {
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+}
 
-.dropdown:hover .dropdown-content {
+.dropdown-content.visible {
     display: block;
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 1000;
-
 }
+
+
+
 
 .dropdown-content button {
     display: flex;
@@ -546,6 +579,11 @@ s {
     max-width: 500px;
     width: 90%;
     position: relative;
+
+    height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .close-modal {
@@ -572,6 +610,20 @@ s {
     margin-bottom: 0.5rem;
 }
 
+input[readonly] {
+    background-color: #f0f0f0;
+    cursor: not-allowed; 
+    color: #888; 
+    border: none; 
+   
+}
+
+input[readonly]:focus {
+    box-shadow: none;
+    outline: none;
+   
+}
+
 .form-group input,
 .form-group textarea,
 .form-group select {
@@ -590,6 +642,9 @@ s {
     cursor: pointer;
     width: 100%;
     transition: background-color 0.3s ease;
+
+    margin-top: 20px;
+
 }
 
 .save-btn:hover {
@@ -617,6 +672,17 @@ s {
         display: none;
     }
 
+    .task-h2{
+        display: none;
+    }
+    .controls{
+        display: flex;
+        flex-direction: row;
+        padding-top: 20px;
+                
+    }
+
+  
     .content {
         margin-left: 0;
         padding: var(--spacing-sm);
@@ -624,6 +690,7 @@ s {
 
     .task-list {
         max-height: calc(100vh - 300px);
+        padding: 50px 0px 0px 20px;
     }
 
     .add-task-btn {
@@ -650,7 +717,7 @@ s {
         padding:var(--spacing-sm);
     }
     .menu img{
-        vertical-align: center;
+        display: none;
     }
    .menu a{
        visibility:visible;
@@ -662,4 +729,3 @@ s {
         left: 0;
     }
 }
-
