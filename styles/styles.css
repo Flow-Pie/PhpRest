@@ -97,13 +97,13 @@ body {
 
 
 .menu a.active {
-    background-color: var(--primary-color); /* Use your primary color */
-    color: var(--white); /* White text */
-    font-weight: 500; /* Semi-bold text */
-    border-radius: var(--border-radius); /* Rounded corners */
-    box-shadow: var(--shadow); /* Subtle shadow for depth */
-    padding: var(--spacing-xsm) var(--spacing-sm); /* Add some padding */
-    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    background-color: var(--primary-color);
+    color: var(--white); 
+    font-weight: 500; 
+    border-radius: var(--border-radius); 
+    box-shadow: var(--shadow); 
+    padding: var(--spacing-xsm) var(--spacing-sm); 
+    transition: all 0.3s ease;
 }
 
 .menu a.active img {
@@ -112,14 +112,10 @@ body {
 
 
 .menu a.active:hover {
-    background-color: var(--secondary-color); /* Change background on hover */
-    color: var(--primary-color); /* Change text color on hover */
-    border-left-color: var(--primary-color); /* Change border color on hover */
+    background-color: var(--secondary-color); 
+    color: var(--primary-color); 
+    border-left-color: var(--primary-color);
 }
-
-
-
-
 
 .menu-toggle{
     margin-left: var(--spacing-sm);
@@ -176,6 +172,7 @@ body {
     padding: var(--spacing-sm);
     padding-left: 0;
     padding-top: var(--spacing-md);
+    font-size: 14px;
 }
 
 .profile:hover {
@@ -183,6 +180,8 @@ body {
     color: var(--white);
     cursor: pointer;
 }
+
+
 
 /* Content */
 .content {
@@ -197,7 +196,7 @@ body {
 
 
 
-/* 2.Task Header css styles */
+/* 2a.Task Header css styles */
 .task-header {
     display: flex;
     justify-content: space-between;
@@ -208,7 +207,7 @@ body {
 }
 
 
-/*2a Filter and Sort Controls css styles */
+/*2b Filter and Sort Controls css styles */
 .task-header .controls {
     display: flex;
     gap: 10px;
@@ -234,7 +233,7 @@ body {
 
 
 
-/*2b Controls Dropdowns css styles */
+/*2c Controls Dropdowns css styles */
 
 #active-filter, #active-sort {
     font-weight: bold;
@@ -245,8 +244,9 @@ body {
     gap: 5px;
     padding: 5px 10px;
     border-radius: 12px;
-    background-color: #e8f5e9; 
-    border: 1px solid #c8e6c9; 
+    background-color: var(--background-color); 
+    border: outset;
+    border-width: 0px;
 }
 
 #active-filter i {
@@ -289,7 +289,7 @@ body {
     font-size: 14px; 
 }
 
-/*2c. Sort Dropdown css styles */
+/*2d. Sort Dropdown css styles */
 
 .sort-dropdown {
     position: relative;
@@ -336,7 +336,7 @@ body {
 
 
 
-/* 3 Task List csss styles */
+/* 3a Task List css styles */
 .task-list {
     margin-top: var(--spacing-md);
     max-height: calc(100vh - 170px);
@@ -383,7 +383,7 @@ body {
 }
 
 .task-item.completed label {
-    color: #666; /* Gray text for completed tasks */
+    color: #666;
 }
 
 .status-tag {
@@ -416,9 +416,21 @@ s {
 
 
 
-/* 3a Task Item Actions(dropdown) css styles */
-.dropdown {
-    position: relative;
+
+
+/* Task item container */
+
+.task-item {
+    background-color: var(--white);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    position: relative; 
+    transition: height 0.3s ease;
 }
 
 .dropdown-toggle {
@@ -435,27 +447,26 @@ s {
     transition: background-color 0.3s ease;
 }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    background: var(--padding-color);
-    min-width: 180px;
-    padding: var(--spacing-sm);
-    box-shadow: var(--shadow);
-    border-radius: 8px;
-    z-index: 100;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+.dropdown-toggle:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
 }
 
 .dropdown-content {
     display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 15%; 
+    background-color: var(--white); 
+    box-shadow: var(--shadow);
+    z-index: 1000;
     opacity: 0;
     transform: translateY(-10px);
     transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 1000;
+    padding: 10px 0; 
+    border:ridge;
+    border-width: 0;
 }
 
 .dropdown-content.visible {
@@ -464,46 +475,30 @@ s {
     transform: translateY(0);
 }
 
-
-
-
 .dropdown-content button {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 8px;
-    font-size: 12px;
-    font-weight: 500;    
-    border-radius: var(--border-radius);
-    transition: background 0.2s ease, transform 0.2s ease;
-    border-style: none;
+    padding: 10px 15px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-color);
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-content button:hover {
     background-color: var(--padding-color);
-    width: 100%;    
+    color: var(--primary-color);
 }
 
 .dropdown-content button i {
     font-size: 16px;
+    padding-right: var(--spacing-sm);
     transition: color 0.2s ease;
-    padding-left: var(--spacing-sm);
-    
-    
-}
-
-.dropdown-content button:hover {   
-    transform: translateX(4px);
-    background-color: var(--white);
-}
-
-
-.dropdown-content button:nth-child(1){
-    color: var(--primary-color);
-}
-
-.dropdown-content button:nth-child(2) {
-    color: var(--danger-color);
-}
-.dropdown-content button:nth-child(3) {
-    color: var(--success-color);
 }
 
 
@@ -547,6 +542,8 @@ s {
 .add-task-btn:hover {
     opacity: 0.9;
 }
+
+
 
 /* 4a Add Task Modal css styles */
 
@@ -651,6 +648,7 @@ input[readonly]:focus {
     background-color: var(--secondary-color);
     color: var(--text-color);
 }
+
 
 
 /* 5. A responsive css Style for mobile devices */

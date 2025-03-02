@@ -9,6 +9,7 @@ let tasks = [],currentFilter = 'all',currentSort = 'default';
 /*****************************
  *       FETCH FUNCTIONS      *
  *****************************/
+
 const fetchData = async (url, callback) => {
     try {
         const res = await fetch(url);
@@ -31,7 +32,8 @@ const fetchUsers = () => fetchData('http://localhost/PhpRest/api/users', setUser
 /*****************************
  *       SETTER METHODS       *
  *****************************/
-// 1. User Profile
+
+// 1.Set User Profile
 const setUserProfile = users => {
     const user = users.find(u => u.user_id == loggedInUser);
     if (user) {
@@ -51,9 +53,9 @@ const updateUIElement = (id, content) => {
 
 const renderTasks = tasks => {
     const taskList = document.querySelector('.task-list');
-    if (!taskList) { taskList.innerHTML = "No tasks"; return; }
+    if (!taskList) { taskList.innerHTML = "No tasks"; return; }    
     taskList.innerHTML = tasks.map(task => `
-        <div class="task-item ${task.status}" role="listitem">
+        <div class="task-item">
             <label>
                 <input type="checkbox" aria-label="Mark Task as Complete" ${task.status === 'complete' ? 'checked' : ''}
                     onchange="confirmMarkAsDone(${task.task_id}, '${escapeHTML(task.task_title)}')">
@@ -64,20 +66,22 @@ const renderTasks = tasks => {
                 <div class="status-tag ${task.status}-tag">
                     ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                 </div>
-                <button class="dropdown-toggle" aria-label="Task Options" aria-haspopup="true" aria-expanded="false"
-                    onclick="toggleDropdown(event)">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                </button>
-                <div class="dropdown-content" role="menu">
-                    <button onclick="edit(${task.task_id}, '${escapeHTML(task.task_title)}', '${escapeHTML(task.task_description)}', '${task.task_date}', '${task.status}', '${task.priority}')">
-                        Edit <i class="fa-regular fa-pen-to-square"></i>
+                <div class="dropdown">
+                    <button class="dropdown-toggle" aria-label="Task Options" aria-haspopup="true" aria-expanded="false"
+                        onclick="toggleDropdown(event)">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
                     </button>
-                    <button onclick="confirmDeleteTask(${task.task_id}, '${escapeHTML(task.task_title)}')">
-                        Delete <i class="fa-solid fa-trash"></i>
-                    </button>
-                    <button onclick="confirmMarkAsDone(${task.task_id}, '${escapeHTML(task.task_title)}')">
-                        Mark as Done <i class="fa-regular fa-circle-check"></i>
-                    </button>
+                    <div class="dropdown-content" role="menu">
+                        <button onclick="edit(${task.task_id}, '${escapeHTML(task.task_title)}', '${escapeHTML(task.task_description)}', '${task.task_date}', '${task.status}', '${task.priority}')">
+                            <i class="fa-regular fa-pen-to-square"></i>Edit
+                        </button>
+                        <button onclick="confirmDeleteTask(${task.task_id}, '${escapeHTML(task.task_title)}')">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                        <button onclick="confirmMarkAsDone(${task.task_id}, '${escapeHTML(task.task_title)}')">
+                            <i class="fa-regular fa-circle-check"></i> Mark Complete
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -85,9 +89,12 @@ const renderTasks = tasks => {
 };
 
 
+
+
 /*****************************
  *    FILTERING & SORTING     *
  *****************************/
+
 const filterTaskByStatus = filter => {
     currentFilter = filter;
     updateUIElement('active-filter', `
@@ -120,11 +127,19 @@ const escapeHTML = str => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').repla
 /*****************************
  *     DROPDOWN HANDLING      *
  *****************************/
-const toggleDropdown = event => {
-    event.stopPropagation();
-    document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('visible'));
-    event.target.nextElementSibling.classList.toggle('visible');
-};
+ 
+
+function toggleDropdown(event) {
+    event.stopPropagation(); 
+    const dropdown = event.currentTarget.closest('.task-item').querySelector('.dropdown-content');
+    const taskItem = event.currentTarget.closest('.task-item');
+
+    dropdown.classList.toggle('visible');
+
+    if (dropdown.classList.contains('visible')) {     
+        taskItem.style.height = 'auto'; 
+    }
+}
 
 document.addEventListener('click', () => document.querySelectorAll('.dropdown-content.visible').forEach(d => d.classList.remove('visible')));
 
@@ -161,6 +176,7 @@ const confirmMarkAsDone = (taskId, title) => confirmAction(`Mark task ${title} a
 /*****************************
  *       FORM HANDLER         *
  *****************************/
+
 const edit = (taskId, title, description, date, status, priority) => {
     const editPanel = document.querySelector('#editTaskModal');
     const form = document.querySelector('#editTaskForm');
