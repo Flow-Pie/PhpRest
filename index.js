@@ -55,7 +55,7 @@ const renderTasks = tasks => {
     const taskList = document.querySelector('.task-list');
     if (!taskList) { taskList.innerHTML = "No tasks"; return; }    
     taskList.innerHTML = tasks.map(task => `
-        <div class="task-item">
+        <div class="task-item" style="background-color: ${task.status === 'complete' ? 'rgb(235,235,228)' : ''};">
             <label>
                 <input type="checkbox" aria-label="Mark Task as Complete" ${task.status === 'complete' ? 'checked' : ''}
                     onchange="confirmMarkAsDone(${task.task_id}, '${escapeHTML(task.task_title)}')">
@@ -114,7 +114,7 @@ const applyFilterAndSort = () => {
     const filteredTasks = tasks.filter(task => currentFilter === 'all' || task.status === currentFilter);
     const sortedTasks = filteredTasks.sort((a, b) => {
         if (currentSort === 'name') return a.task_title.localeCompare(b.task_title);
-        if (currentSort === 'date') return new Date(a.task_date) - new Date(b.task_date);
+        if (currentSort === 'date') return new Date(b.task_date) - new Date(a.task_date);
         if (currentSort === 'status') return b.status.localeCompare(a.status);
         return 0;
     });
